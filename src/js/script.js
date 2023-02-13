@@ -44,7 +44,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     // Timer
 
-    const deadline = "2023-02-13";
+    const deadline = "2023-03-13";
 
     function getTimeRemaining(endtime) {
         let days, hours, minutes, seconds;
@@ -101,4 +101,58 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     setClock(".timer", deadline);
+
+    // Modal
+    const btnsModalTrigger = document.querySelectorAll("[data-modal]"),
+        modal = document.querySelector(".modal"),
+        modalClose = document.querySelector("[data-close]");
+    //  получение data атрибутов []
+
+    btnsModalTrigger.forEach((btn) => {
+        // перебераем всё тэги data-modal
+        btn.addEventListener("click", () => {
+            // 1-й вариант
+            // modal.classList.toggle("show");
+            // 2-й вариант
+            modal.classList.add("show");
+            modal.classList.remove("hide");
+            document.body.style.overflow = "hidden";
+            // убераем прокрутку страницы
+        });
+    });
+
+    // оптимизация за счёт функции
+    function closeModal() {
+        modal.classList.add("hide");
+        modal.classList.remove("show");
+        document.body.style.overflow = "";
+    }
+
+    modalClose.addEventListener("click", closeModal);
+    // modalClose.addEventListener("click", () => {
+    //     // 1-й вариант
+    //     // modal.classList.toggle("show");
+    //     // 2-й вариант
+    //     modal.classList.add("hide");
+    //     modal.classList.remove("show");
+    //     document.body.style.overflow = "";
+    //     // возращаем прокрутку страницы стандартное значение
+    // });
+
+    // закрытие modal по клику в области
+    modal.addEventListener("click", (e) => {
+        if (e.target === modal) {
+            closeModal();
+            // modal.classList.add("hide");
+            // modal.classList.remove("show");
+            // document.body.style.overflow = "";
+        }
+    });
+
+    // события при нажатии на клавишу esc
+    document.addEventListener("keydown", (e) => {
+        if (e.code === "Escape" && modal.classList.contains("show")) {
+            closeModal();
+        }
+    });
 });
