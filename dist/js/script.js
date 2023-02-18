@@ -167,14 +167,14 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
     // Открытие модального окна по таймеру ф-я setTimeout
-    const modalTimerId = setTimeout(openModal, 10000);
+    // const modalTimerId = setTimeout(openModal, 10000);
 
     // Открытие модального окна после прокрутки страницы до конца
     // высота клиентского окна + высота скрола >= всей высоте страницы
     function showModalByScroll() {
         if (
             document.documentElement.clientHeight + window.scrollY >=
-            document.documentElement.scrollHeight - 1
+            document.documentElement.scrollHeight
         ) {
             openModal();
             window.removeEventListener("scroll", showModalByScroll);
@@ -182,4 +182,109 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     window.addEventListener("scroll", showModalByScroll);
+
+    // test my script
+    // class Cart {
+    //     constructor(
+    //         // srsMenuItem,
+    //         // subtitleMenuItem,
+    //         // descrMenuItem,
+    //         // priceMenuItem
+    //     ) {
+    //         // this.srsMenuItem = srsMenuItem;
+    //         // this.subtitleMenuItem = subtitleMenuItem;
+    //         // this.descrMenuItem = descrMenuItem;
+    //         // this.priceMenuItem = priceMenuItem;
+    //     }
+
+    //     criateNewCart() {
+    //         let srsMenuItem = "img/tabs/vegy.jpg";
+    //         let subtitleMenuItem = "Меню “Фитнес”";
+    //         let descrMenuItem =
+    //             'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!';
+    //         let priceMenuItem = 229;
+
+    //         const div = document.createElement("div");
+    //         const parentMenuItem = document.getElementById("newCart");
+
+    //         div.className = "menu__item";
+    //         div.innerHTML = `
+    //         <img src="${srsMenuItem}" alt="imgCriateMenu">
+    //         <h3 class="menu__item-subtitle">${subtitleMenuItem}</h3>
+    //         <div class="menu__item-descr">${descrMenuItem}</div>
+    //         <div class="menu__item-divider"></div>
+    //         <div class="menu__item-price">
+    //             <div class="menu__item-cost">Цена:</div>
+    //             <div class="menu__item-total"><span>${priceMenuItem}</span> грн/день</div>
+    //         </div>`;
+    //         parentMenuItem.prepend(div);
+    //     }
+    // }
+    // let card = new Cart();
+    // card.criateNewCart();
+
+    // Испальзуем классы карточек
+    class MenuCard {
+        constructor(src, alt, title, descr, price, parentSelector) {
+            this.src = src;
+            this.alt = alt;
+            this.title = title;
+            this.descr = descr;
+            this.price = price;
+            this.parent = document.querySelector(parentSelector);
+            this.transfer = 74;
+            // возвращаем изменённое значение price функцией changeToRUB
+            this.changeToRUB();
+        }
+        // изменяем прайс из $ в RUB
+        changeToRUB() {
+            this.price = this.price * this.transfer;
+        }
+
+        render() {
+            const element = document.createElement("div");
+            element.innerHTML = `
+            <div class="menu__item">
+                <img src=${this.src} alt=${this.alt}>
+                <h3 class="menu__item-subtitle">${this.title}</h3>
+                <div class="menu__item-descr">${this.descr}</div>
+                <div class="menu__item-divider"></div>
+                <div class="menu__item-price">
+                    <div class="menu__item-cost">Цена:</div>
+                    <div class="menu__item-total"><span>${this.price}</span> руб/день</div>
+                </div>
+            </div>`;
+            this.parent.append(element);
+        }
+    }
+
+    // const card = new MenuCard(........);
+    // card.render();
+    // или не сохранять в переменную класс, тогда он создаться и удалиться!
+    new MenuCard(
+        "img/tabs/vegy.jpg",
+        "vegy",
+        'Меню "Фитнес"',
+        'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
+        9,
+        ".menu .container"
+    ).render();
+
+    new MenuCard(
+        "img/tabs/elite.jpg",
+        "elite",
+        'Меню "Фитнес"',
+        'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
+        15,
+        ".menu .container"
+    ).render();
+
+    new MenuCard(
+        "img/tabs/post.jpg",
+        "post",
+        'Меню "Постное"',
+        'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
+        11,
+        ".menu .container"
+    ).render();
 });
