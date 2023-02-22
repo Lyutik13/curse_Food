@@ -332,12 +332,24 @@ window.addEventListener("DOMContentLoaded", () => {
             request.open("POST", "server.php");
 
             // при отправки через form data format (setRequestHeader) не нужен!
-            // request.setRequestHeader("Content-type", "multipart/form-data");
+            request.setRequestHeader(
+                "Content-type",
+                "application/json; charset=utf-8"
+            );
 
             // всегда проверяй в верстке что бы в input был name=""
             const formData = new FormData(form);
 
-            request.send(formData);
+            // создаем object и прогоняем через forEach для формирования JSON.stringify
+            const object = {};
+            formData.forEach(function (value, key) {
+                object[key] = value;
+            });
+            
+            // php не умеет работать с таким форматом данный смотри файл server.php
+            request.send(JSON.stringify(object));
+
+            // request.send(formData);
 
             request.addEventListener("load", () => {
                 if (request.status === 200) {
