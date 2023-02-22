@@ -301,4 +301,58 @@ window.addEventListener("DOMContentLoaded", () => {
         ".menu .container",
         "menu__item"
     ).render();
+
+    // Form
+    // form data format (no JSON!)
+    const forms = document.querySelectorAll("form");
+
+    const message = {
+        loading: "Загрузка",
+        success: "Спасибо! Скоро мы с вами свяжемся",
+        error: "Что то пошло не так...",
+    };
+
+    forms.forEach((item) => {
+        postData(item);
+    });
+
+    function postData(form) {
+        form.addEventListener("submit", (e) => {
+            // отменяем стандартное поведение браузера
+            e.preventDefault();
+
+            // создаёт текстовое сообщение
+            const statusMessage = document.createElement("div");
+            statusMessage.classList.add("status");
+            statusMessage.textContent = message.loading;
+            // отправляем текстовое сообщение
+            form.append(statusMessage);
+
+            const request = new XMLHttpRequest();
+            request.open("POST", "server.php");
+
+            // при отправки через form data format (setRequestHeader) не нужен!
+            // request.setRequestHeader("Content-type", "multipart/form-data");
+
+            // всегда проверяй в верстке что бы в input был name=""
+            const formData = new FormData(form);
+
+            request.send(formData);
+
+            request.addEventListener("load", () => {
+                if (request.status === 200) {
+                    console.log(request.response);
+                    statusMessage.textContent = message.success;
+                    // очищаем форму после отправки
+                    form.reset();
+                    // удаляем сообщение через 2сек
+                    setTimeout(() => {
+                        statusMessage.remove();
+                    }, 2000);
+                } else {
+                    statusMessage.textContent = message.error;
+                }
+            });
+        });
+    }
 });
