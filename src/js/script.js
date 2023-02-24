@@ -1,7 +1,7 @@
 "use strict";
 
 window.addEventListener("DOMContentLoaded", () => {
-    // Tabs
+    // /////////////// Tabs /////////////// 
 
     const tabs = document.querySelectorAll(".tabheader__item"),
         tabsContent = document.querySelectorAll(".tabcontent"),
@@ -42,7 +42,7 @@ window.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Timer
+    // ///////////////  Timer /////////////// 
 
     const deadline = "2023-03-13";
 
@@ -102,10 +102,10 @@ window.addEventListener("DOMContentLoaded", () => {
 
     setClock(".timer", deadline);
 
-    // Modal
+    //  /////////////// Modal /////////////// 
     const btnsModalTrigger = document.querySelectorAll("[data-modal]"),
-        modal = document.querySelector(".modal"),
-        modalClose = document.querySelector("[data-close]");
+        modal = document.querySelector(".modal");
+    // modalClose = document.querySelector("[data-close]");
     //  получение data атрибутов []
 
     // оптимизация за счёт функции открытия модального окна
@@ -138,7 +138,8 @@ window.addEventListener("DOMContentLoaded", () => {
         document.body.style.overflow = "";
     }
 
-    modalClose.addEventListener("click", closeModal);
+    // modalClose.addEventListener("click", closeModal);
+
     // modalClose.addEventListener("click", () => {
     //     // 1-й вариант
     //     // modal.classList.toggle("show");
@@ -151,7 +152,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     // закрытие modal по клику в области
     modal.addEventListener("click", (e) => {
-        if (e.target === modal) {
+        if (e.target === modal || e.target.getAttribute("data-close") == "") {
             closeModal();
             // modal.classList.add("hide");
             // modal.classList.remove("show");
@@ -183,46 +184,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     window.addEventListener("scroll", showModalByScroll);
 
-    // test my script
-    // class Cart {
-    //     constructor(
-    //         // srsMenuItem,
-    //         // subtitleMenuItem,
-    //         // descrMenuItem,
-    //         // priceMenuItem
-    //     ) {
-    //         // this.srsMenuItem = srsMenuItem;
-    //         // this.subtitleMenuItem = subtitleMenuItem;
-    //         // this.descrMenuItem = descrMenuItem;
-    //         // this.priceMenuItem = priceMenuItem;
-    //     }
-
-    //     criateNewCart() {
-    //         let srsMenuItem = "img/tabs/vegy.jpg";
-    //         let subtitleMenuItem = "Меню “Фитнес”";
-    //         let descrMenuItem =
-    //             'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!';
-    //         let priceMenuItem = 229;
-
-    //         const div = document.createElement("div");
-    //         const parentMenuItem = document.getElementById("newCart");
-
-    //         div.className = "menu__item";
-    //         div.innerHTML = `
-    //         <img src="${srsMenuItem}" alt="imgCriateMenu">
-    //         <h3 class="menu__item-subtitle">${subtitleMenuItem}</h3>
-    //         <div class="menu__item-descr">${descrMenuItem}</div>
-    //         <div class="menu__item-divider"></div>
-    //         <div class="menu__item-price">
-    //             <div class="menu__item-cost">Цена:</div>
-    //             <div class="menu__item-total"><span>${priceMenuItem}</span> грн/день</div>
-    //         </div>`;
-    //         parentMenuItem.prepend(div);
-    //     }
-    // }
-    // let card = new Cart();
-    // card.criateNewCart();
-
+    // ///////////////  создание карточек JS-сом /////////////// 
     // Используем классы карточек
     class MenuCard {
         constructor(src, alt, title, descr, price, parentSelector, ...classes) {
@@ -302,12 +264,12 @@ window.addEventListener("DOMContentLoaded", () => {
         "menu__item"
     ).render();
 
-    // Form
-    // form data format (no JSON!)
+    // ///////////////  Form /////////////// 
+    // form data format (no JSON!) and with
     const forms = document.querySelectorAll("form");
 
     const message = {
-        loading: "Загрузка",
+        loading: "img/form/spinner.svg",
         success: "Спасибо! Скоро мы с вами свяжемся",
         error: "Что то пошло не так...",
     };
@@ -322,11 +284,15 @@ window.addEventListener("DOMContentLoaded", () => {
             e.preventDefault();
 
             // создаёт текстовое сообщение
-            const statusMessage = document.createElement("div");
-            statusMessage.classList.add("status");
-            statusMessage.textContent = message.loading;
+            const statusMessage = document.createElement("img");
+            statusMessage.src = message.loading;
+            statusMessage.style.cssText = `
+            display: block;
+            margin: 0 auto;
+            `;
             // отправляем текстовое сообщение
-            form.append(statusMessage);
+            // form.append(statusMessage);
+            form.insertAdjacentElement("afterend", statusMessage);
 
             const request = new XMLHttpRequest();
             request.open("POST", "server.php");
@@ -345,7 +311,7 @@ window.addEventListener("DOMContentLoaded", () => {
             formData.forEach(function (value, key) {
                 object[key] = value;
             });
-            
+
             // php не умеет работать с таким форматом данный смотри файл server.php
             request.send(JSON.stringify(object));
 
@@ -354,17 +320,42 @@ window.addEventListener("DOMContentLoaded", () => {
             request.addEventListener("load", () => {
                 if (request.status === 200) {
                     console.log(request.response);
-                    statusMessage.textContent = message.success;
+                    showThanksModal(message.success);
                     // очищаем форму после отправки
                     form.reset();
-                    // удаляем сообщение через 2сек
-                    setTimeout(() => {
-                        statusMessage.remove();
-                    }, 2000);
+                    // удаляем сообщение
+                    statusMessage.remove();
                 } else {
-                    statusMessage.textContent = message.error;
+                    showThanksModal(message.error);
                 }
             });
         });
+    }
+
+    //
+    function showThanksModal(message) {
+        const prevModalDialig = document.querySelector(".modal__dialog");
+        // скрываем контент
+        prevModalDialig.classList.add("hide");
+        openModal();
+
+        // создаем новый контент
+        const thanksModal = document.createElement("div");
+        thanksModal.classList.add("modal__dialog");
+        thanksModal.innerHTML = `
+        <div class="modal__content">
+            <div data-close class="modal__close">&times;</div>
+            <div class="modal__title">${message}</div>
+        </div>
+        `;
+
+        // добавляем
+        document.querySelector(".modal").append(thanksModal);
+        setTimeout(() => {
+            thanksModal.remove();
+            prevModalDialig.classList.add("show");
+            prevModalDialig.classList.remove("hide");
+            closeModal();
+        }, 4000);
     }
 });
