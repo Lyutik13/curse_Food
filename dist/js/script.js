@@ -1,7 +1,7 @@
 "use strict";
 
 window.addEventListener("DOMContentLoaded", () => {
-    // /////////////// Tabs /////////////// 
+    // /////////////// Tabs ///////////////
 
     const tabs = document.querySelectorAll(".tabheader__item"),
         tabsContent = document.querySelectorAll(".tabcontent"),
@@ -42,7 +42,7 @@ window.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // ///////////////  Timer /////////////// 
+    // ///////////////  Timer ///////////////
 
     const deadline = "2023-03-13";
 
@@ -102,7 +102,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     setClock(".timer", deadline);
 
-    //  /////////////// Modal /////////////// 
+    //  /////////////// Modal ///////////////
     const btnsModalTrigger = document.querySelectorAll("[data-modal]"),
         modal = document.querySelector(".modal");
     // modalClose = document.querySelector("[data-close]");
@@ -184,7 +184,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     window.addEventListener("scroll", showModalByScroll);
 
-    // ///////////////  создание карточек JS-сом /////////////// 
+    // ///////////////  создание карточек JS-сом ///////////////
     // Используем классы карточек
     class MenuCard {
         constructor(src, alt, title, descr, price, parentSelector, ...classes) {
@@ -264,7 +264,7 @@ window.addEventListener("DOMContentLoaded", () => {
         "menu__item"
     ).render();
 
-    // ///////////////  Form /////////////// 
+    // ///////////////  Form ///////////////
     // form data format (no JSON!) and with
     const forms = document.querySelectorAll("form");
 
@@ -294,15 +294,6 @@ window.addEventListener("DOMContentLoaded", () => {
             // form.append(statusMessage);
             form.insertAdjacentElement("afterend", statusMessage);
 
-            const request = new XMLHttpRequest();
-            request.open("POST", "server.php");
-
-            // при отправки через form data format (setRequestHeader) не нужен!
-            request.setRequestHeader(
-                "Content-type",
-                "application/json; charset=utf-8"
-            );
-
             // всегда проверяй в верстке что бы в input был name=""
             const formData = new FormData(form);
 
@@ -313,22 +304,29 @@ window.addEventListener("DOMContentLoaded", () => {
             });
 
             // php не умеет работать с таким форматом данный смотри файл server.php
-            request.send(JSON.stringify(object));
 
-            // request.send(formData);
-
-            request.addEventListener("load", () => {
-                if (request.status === 200) {
-                    console.log(request.response);
+            // fetch
+            fetch("server.php", {
+                method: "POST",
+                headers: {
+                    "Content-type": "application/json; charset=utf-8",
+                },
+                body: JSON.stringify(object),
+            })
+                .then((data) => data.text())
+                .then((data) => {
+                    console.log(data);
                     showThanksModal(message.success);
-                    // очищаем форму после отправки
-                    form.reset();
                     // удаляем сообщение
                     statusMessage.remove();
-                } else {
+                })
+                .catch(() => {
                     showThanksModal(message.error);
-                }
-            });
+                })
+                .finally(() => {
+                    // очищаем форму после отправки
+                    form.reset();
+                });
         });
     }
 
