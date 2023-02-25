@@ -196,13 +196,13 @@ window.addEventListener("DOMContentLoaded", () => {
             // добавили ещё параметры (...classes) передающееся в масив!
             this.classes = classes;
             this.parent = document.querySelector(parentSelector);
-            this.transfer = 74;
+            this.transfer = 76.02;
             // возвращаем изменённое значение price функцией changeToRUB
             this.changeToRUB();
         }
         // изменяем прайс из $ в RUB
         changeToRUB() {
-            this.price = this.price * this.transfer;
+            this.price = (this.price * this.transfer).toFixed(2);
         }
 
         render() {
