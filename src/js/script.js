@@ -234,6 +234,26 @@ window.addEventListener("DOMContentLoaded", () => {
     // const card = new MenuCard(........);
     // card.render();
     // или не сохранять в переменную класс, тогда он создаться и удалиться!
+
+    const getResourse = async (url) => {
+        const res = await fetch(url);
+
+        // обработка ошибки т.к. fetch не выдаёт ошибки 404 500 502 ... Ошибки для fetch это отсутствие интернета или критические ошибки.
+        if (!res.ok) {
+            throw new Error(`Could not fetch${url}, ststus: ${res.status}`);
+        }
+
+        return await res.json();
+    };
+
+    // Создаем карты из данныз бэка db.json
+    getResourse("http://localhost:3000/menu").then((data) => {
+        data.forEach(({img, altimg, title, descr, price}) => {
+            new MenuCard(img, altimg, title, descr, price, ".menu .container").render();
+        });
+    });
+
+    /*
     new MenuCard(
         "img/tabs/vegy.jpg",
         "vegy",
@@ -263,6 +283,7 @@ window.addEventListener("DOMContentLoaded", () => {
         ".menu .container",
         "menu__item"
     ).render();
+    */
 
     // ///////////////  Form ///////////////
     // form data format (no JSON!) and with
@@ -275,10 +296,23 @@ window.addEventListener("DOMContentLoaded", () => {
     };
 
     forms.forEach((item) => {
-        postData(item);
+        bindPostData(item);
     });
 
-    function postData(form) {
+    // async/await делаем код асинхронным что бы дождаться ответа от сервера и не получить ошибку что ничего нет в переменной!
+    const postData = async (url, data) => {
+        const res = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json; charset=utf-8",
+            },
+            body: data,
+        });
+
+        return await res.json();
+    };
+
+    function bindPostData(form) {
         form.addEventListener("submit", (e) => {
             // отменяем стандартное поведение браузера
             e.preventDefault();
@@ -298,22 +332,27 @@ window.addEventListener("DOMContentLoaded", () => {
             const formData = new FormData(form);
 
             // создаем object и прогоняем через forEach для формирования JSON.stringify
-            const object = {};
-            formData.forEach(function (value, key) {
-                object[key] = value;
-            });
+            // const object = {};
+            // formData.forEach(function (value, key) {
+            //     object[key] = value;
+            // });
+
+            // entries() делает масив в масиве для преобразования в JSON
+            const json = JSON.stringify(Object.fromEntries(formData.entries()));
 
             // php не умеет работать с таким форматом данный смотри файл server.php
 
-            // fetch
-            fetch("server.php", {
-                method: "POST",
-                headers: {
-                    "Content-type": "application/json; charset=utf-8",
-                },
-                body: JSON.stringify(object),
-            })
-                .then((data) => data.text())
+            // fetch вместо XMLHttpRequest
+            // fetch("server.php", {
+            //     method: "POST",
+            //     headers: {
+            //         "Content-type": "application/json; charset=utf-8",
+            //     },
+            //     body: JSON.stringify(object),
+            // })
+
+            postData("http://localhost:3000/requests", json)
+                // .then((data) => data.text())
                 .then((data) => {
                     console.log(data);
                     showThanksModal(message.success);
@@ -356,4 +395,9 @@ window.addEventListener("DOMContentLoaded", () => {
             closeModal();
         }, 4000);
     }
+
+    // тест БД и перевод её с JSON
+    // fetch("http://localhost:3000/menu")
+    //     .then((data) => data.json())
+    //     .then((res) => console.log(res));
 });
