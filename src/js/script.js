@@ -248,8 +248,15 @@ window.addEventListener("DOMContentLoaded", () => {
 
     // Создаем карты из данныз бэка db.json
     getResourse("http://localhost:3000/menu").then((data) => {
-        data.forEach(({img, altimg, title, descr, price}) => {
-            new MenuCard(img, altimg, title, descr, price, ".menu .container").render();
+        data.forEach(({ img, altimg, title, descr, price }) => {
+            new MenuCard(
+                img,
+                altimg,
+                title,
+                descr,
+                price,
+                ".menu .container"
+            ).render();
         });
     });
 
@@ -396,8 +403,50 @@ window.addEventListener("DOMContentLoaded", () => {
         }, 4000);
     }
 
-    // тест БД и перевод её с JSON
-    // fetch("http://localhost:3000/menu")
-    //     .then((data) => data.json())
-    //     .then((res) => console.log(res));
+    /////////////// Slider ///////////////
+    const slides = document.querySelectorAll(".offer__slide"),
+        slidePrev = document.querySelector(".offer__slider-prev"),
+        slideNext = document.querySelector(".offer__slider-next"),
+        current = document.querySelector("#current"),
+        total = document.querySelector("#total");
+    let slideIndex = 1;
+
+    showSlides(slideIndex);
+
+    if (slides.length < 10) {
+        total.textContent = `0${slides.length}`;
+    } else {
+        total.textContent = slides.length;
+    }
+
+    function showSlides(n) {
+        if (n > slides.length) {
+            slideIndex = 1;
+        }
+        if (n < 1) {
+            slideIndex = slides.length;
+        }
+
+        slides.forEach((item) => (item.style.display = "none"));
+
+        slides[slideIndex - 1].style.display = "block";
+
+        if (slides.length < 10) {
+            current.textContent = `0${slideIndex}`;
+        } else {
+            current.textContent = slideIndex;
+        }
+    }
+
+    function plusSlides(n) {
+        showSlides((slideIndex += n));
+    }
+
+    slidePrev.addEventListener("click", () => {
+        plusSlides(-1);
+    });
+
+    slideNext.addEventListener("click", () => {
+        plusSlides(1);
+    });
 });
