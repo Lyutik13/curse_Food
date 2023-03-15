@@ -103,6 +103,7 @@ window.addEventListener("DOMContentLoaded", () => {
     setClock(".timer", deadline);
 
     //  /////////////// Modal ///////////////
+
     const btnsModalTrigger = document.querySelectorAll("[data-modal]"),
         modal = document.querySelector(".modal");
     // modalClose = document.querySelector("[data-close]");
@@ -185,6 +186,7 @@ window.addEventListener("DOMContentLoaded", () => {
     window.addEventListener("scroll", showModalByScroll);
 
     // ///////////////  создание карточек JS-сом ///////////////
+
     // Используем классы карточек
     class MenuCard {
         constructor(src, alt, title, descr, price, parentSelector, ...classes) {
@@ -196,7 +198,7 @@ window.addEventListener("DOMContentLoaded", () => {
             // добавили ещё параметры (...classes) передающееся в масив!
             this.classes = classes;
             this.parent = document.querySelector(parentSelector);
-            this.transfer = 76.02;
+            this.transfer = 75.75;
             // возвращаем изменённое значение price функцией changeToRUB
             this.changeToRUB();
         }
@@ -293,6 +295,7 @@ window.addEventListener("DOMContentLoaded", () => {
     */
 
     // ///////////////  Form ///////////////
+
     // form data format (no JSON!) and with
     const forms = document.querySelectorAll("form");
 
@@ -404,6 +407,7 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     /////////////// Slider ///////////////
+
     const slides = document.querySelectorAll(".offer__slide"),
         slider = document.querySelector(".offer__slider"),
         slidePrev = document.querySelector(".offer__slider-prev"),
@@ -575,8 +579,23 @@ window.addEventListener("DOMContentLoaded", () => {
     */
 
     /////////////// Calculate ///////////////
+
     const result = document.querySelector(".calculating__result span");
-    let sex = "female", height, weight, age, ratio = 1.2;
+    let sex, height, weight, age, ratio;
+
+    if (localStorage.getItem("sex")) {
+        sex = localStorage.getItem("sex");
+    } else {
+        sex = "female";
+        localStorage.setItem("sex", "female");
+    }
+
+    if (localStorage.getItem("ratio")) {
+        ratio = localStorage.getItem("ratio");
+    } else {
+        ratio = 1.2;
+        localStorage.setItem("ratio", "female");
+    }
 
     function calcTolal() {
         if (!sex || !height || !weight || !age || !ratio) {
@@ -586,25 +605,54 @@ window.addEventListener("DOMContentLoaded", () => {
 
         // Формула Харрисона-Бенедикта
         if (sex === "female") {
-            result.textContent =
-                Math.round((655.1 + (9.563 * weight) + (1.85 * height) - (4.676 * age)) * ratio);
+            result.textContent = Math.round(
+                (655.1 + 9.563 * weight + 1.85 * height - 4.676 * age) * ratio
+            );
         } else {
-            result.textContent =
-            Math.round((66.5 + (13.75 * weight) + (5.003 * height) - (6.775 * age)) * ratio);
+            result.textContent = Math.round(
+                (66.5 + 13.75 * weight + 5.003 * height - 6.775 * age) * ratio
+            );
         }
     }
 
     calcTolal();
 
-    function getStaticInformation(parentSelector, activeClass) {
-        const elements = document.querySelectorAll(`${parentSelector} div`);
+    function initLocalSettings(selector, activeClass) {
+        const elements = document.querySelectorAll(selector);
 
         elements.forEach(elem => {
+            elem.classList.remove(activeClass);
+            if (elem.getAttribute('id') === localStorage.getItem('sex')) {
+                elem.classList.add(activeClass);
+            }
+            if (elem.getAttribute('data-ratio') === localStorage.getItem('ratio')) {
+                elem.classList.add(activeClass);
+            }
+        });
+    }
+
+    initLocalSettings("#gender div", "calculating__choose-item_active");
+    initLocalSettings(
+        ".calculating__choose_big div",
+        "calculating__choose-item_active"
+    );
+
+    function getStaticInformation(selector, activeClass) {
+        const elements = document.querySelectorAll(selector);
+
+        elements.forEach((elem) => {
             elem.addEventListener("click", (e) => {
                 if (e.target.getAttribute("data-ratio")) {
                     ratio = +e.target.getAttribute("data-ratio");
+                    // save in localStorage info
+                    localStorage.setItem(
+                        "ratio",
+                        +e.target.getAttribute("data-ratio")
+                    );
                 } else {
                     sex = e.target.getAttribute("id");
+                    // save in localStorage info
+                    localStorage.setItem("sex", e.target.getAttribute("id"));
                 }
 
                 elements.forEach((elem) => {
@@ -614,7 +662,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 e.target.classList.add(activeClass);
                 calcTolal();
             });
-        })
+        });
         /*document
             .querySelector(parentSelector)
             .addEventListener("click", (e) => {
@@ -633,9 +681,9 @@ window.addEventListener("DOMContentLoaded", () => {
             });*/
     }
 
-    getStaticInformation("#gender", "calculating__choose-item_active");
+    getStaticInformation("#gender div", "calculating__choose-item_active");
     getStaticInformation(
-        ".calculating__choose_big",
+        ".calculating__choose_big div",
         "calculating__choose-item_active"
     );
 
@@ -643,6 +691,13 @@ window.addEventListener("DOMContentLoaded", () => {
         const input = document.querySelector(selector);
 
         input.addEventListener("input", () => {
+            // проверка на число через подсвечивания (регулярные выражения)
+            if (input.value.match(/\D/g)) {
+                input.style.border = "1px solid red";
+            } else {
+                input.style.border = "none";
+            }
+
             switch (input.getAttribute("id")) {
                 case "height":
                     height = +input.value;
