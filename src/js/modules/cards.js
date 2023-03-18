@@ -1,6 +1,6 @@
-function cards() {
-    // ///////////////  создание карточек JS-сом ///////////////
+import { getResourse } from "../services/services";
 
+function cards() {
     // Используем классы карточек
     class MenuCard {
         constructor(src, alt, title, descr, price, parentSelector, ...classes) {
@@ -51,7 +51,7 @@ function cards() {
     // card.render();
     // или не сохранять в переменную класс, тогда он создаться и удалиться!
 
-    const getResourse = async (url) => {
+    /*const getResourse = async (url) => {
         const res = await fetch(url);
 
         // обработка ошибки т.к. fetch не выдаёт ошибки 404 500 502 ... Ошибки для fetch это отсутствие интернета или критические ошибки.
@@ -61,6 +61,8 @@ function cards() {
 
         return await res.json();
     };
+    перенес в servises
+    */
 
     // Создаем карты из данныз бэка db.json
     getResourse("http://localhost:3000/menu").then((data) => {
@@ -107,7 +109,6 @@ function cards() {
         "menu__item"
     ).render();
     */
-
 }
 
-module.exports = cards;
+export default cards;
